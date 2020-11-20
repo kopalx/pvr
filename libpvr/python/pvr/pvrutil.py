@@ -132,53 +132,53 @@ def setupTransmittanceMap(baseRenderer, light, resolution, orientation, fov,
 
 def printArrayAttrs(table, namesFunc, refFunc, valFunc, typeStr):
     names = namesFunc()
-    print "  " + typeStr + " attrs:"
+    print("  " + typeStr + " attrs:")
     if len(names) == 0:
-        print "     None"
+        print("     None")
         return
     for attr in names:
-        print "    ", attr
+        print( "    ", attr)
         for i in range(0, table.size()):
             ref = refFunc(attr)
             vals = []
             for c in range(0, ref.arraySize()):
                 vals.append(str(valFunc(ref, i, c)))
-            print "       " + str(i) + ":", ", ".join(vals)
+            print( "       " + str(i) + ":", ", ".join(vals))
 
 # ------------------------------------------------------------------------------
 
 def printAttrs(table, namesFunc, refFunc, valFunc, typeStr):
     names = namesFunc()
-    print "  " + typeStr + " attrs:"
+    print("  " + typeStr + " attrs:")
     if len(names) == 0:
-        print "     None"
+        print("     None")
         return
     for attr in names:
-        print "    ", attr
+        print( "    ", attr)
         for i in range(0, table.size()):
             ref = refFunc(attr)
             val = valFunc(ref, i)
-            print "       " + str(i) + ":", str(val)
+            print("       " + str(i) + ":", str(val))
 
 # ------------------------------------------------------------------------------
 
 def printStrAttrs(table):
     names = table.stringAttrNames()
-    print "  string attrs:"
+    print("  string attrs:")
     if len(names) == 0:
-        print "     None"
+        print( "     None")
         return
     for attr in names:
-        print "    ", attr
+        print("    ", attr)
         for i in range(0, table.size()):
             ref = table.stringAttrRef(attr)
             val = table.stringAttr(ref, i)
-            print "       " + str(i) + ":", str(val)
+            print("       " + str(i) + ":", str(val))
 
 # ------------------------------------------------------------------------------
 
 def printAttrTable(t):
-    print "AttrTable:", t
+    print("AttrTable:", t)
     printArrayAttrs(t, t.intAttrNames, t.intAttrRef, t.intAttr, "int")
     printArrayAttrs(t, t.floatAttrNames, t.floatAttrRef, t.floatAttr, "float")
     printAttrs(t, t.vectorAttrNames, t.vectorAttrRef, t.vectorAttr, "vector")

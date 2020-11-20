@@ -125,7 +125,7 @@ def makeLight(renderer, parms, resMult, occlType, lightType):
     try:
         return LIGHT_MAP[lightType](renderer, parms, resMult, occlType)
     except KeyError:
-        print "Unrecognized light type (%s) in makeLight()" % lightType
+        print("Unrecognized light type (%s) in makeLight()" % lightType)
 
 # ------------------------------------------------------------------------------
 

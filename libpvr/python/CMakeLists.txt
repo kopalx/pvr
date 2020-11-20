@@ -5,7 +5,7 @@
 FIND_PACKAGE( PythonLibs)
 
 # find boost again, this time with boost_python
-FIND_PACKAGE( Boost COMPONENTS thread python)
+FIND_PACKAGE( Boost COMPONENTS thread python38)
 
 ##############################################################################
 # Includes

@@ -129,7 +129,7 @@ private:
   // Private data members ------------------------------------------------------
 
   //! Internal representation of RGBA image.
-  OpenImageIO::ImageBuf m_buf;
+  OpenImageIO_v2_1::ImageBuf m_buf;
 
 };
 

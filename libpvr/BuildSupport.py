@@ -23,8 +23,8 @@ src            = "src"
 lib            = "lib"
 
 python         = "python"
-python26       = "python26"
-python26apple  = "python26-apple"
+python38       = "python38"
+python38apple  = "python38-apple"
 
 siteFile       = "Site.py"
 
@@ -32,7 +32,7 @@ arch32         = "m32"
 arch64         = "m64"
 
 darwin         = "darwin"
-linux2         = "linux2"
+linux          = "linux"
 
 # ------------------------------------------------------------------------------
 # Paths
@@ -43,7 +43,7 @@ systemIncludePaths = {
                          "/opt/local/include"],
                arch64 : ["/usr/local/include",
                          "/opt/local/include"] },
-    linux2 : { arch32 : ["/usr/local/include"],
+    linux : { arch32 : ["/usr/local/include"],
                arch64 : ["/usr/local64/include", "/usr/include"] }
     }
 
@@ -52,44 +52,44 @@ systemLibPaths = {
                          "/opt/local/lib"],
                arch64 : ["/usr/local/lib",
                          "/opt/local/lib"] },
-    linux2 : { arch32 : ["/usr/local/lib"],
+    linux : { arch32 : ["/usr/local/lib"],
                arch64 : ["/usr/local64/lib",
                          "/usr/lib64"] }
     }
 
 systemPyCppPaths = {
-    darwin : { arch32 : { python26 :
+    darwin : { arch32 : { python38 :
                           ["/opt/local/Library/Frameworks/Python.framework/Versions/2.6/Headers"],
-                          python26apple : 
+                          python38apple : 
                           ["/System/Library/Frameworks/Python.framework/Versions/2.6/Headers"] },
-               arch64 : { python26 : 
+               arch64 : { python38 : 
                           ["/opt/local/Library/Frameworks/Python.framework/Versions/2.6/Headers"],
-                          python26apple : 
+                          python38apple : 
                           ["/System/Library/Frameworks/Python.framework/Versions/2.6/Headers"] } },
-    linux2 : { arch32 : { python26 : 
-                          ["/usr/include/python2.6"] },
-               arch64 : { python26 :
-                          ["/usr/include/python2.6"] } }
+    linux : { arch32 : { python38 : 
+                          ["/usr/include/python3.8"] },
+               arch64 : { python38 :
+                          ["/usr/include/python3.8"] } }
     }
 
 systemPyLibPaths = {
-    darwin : { arch32 : { python26 :
+    darwin : { arch32 : { python38 :
                           ["/opt/local/Library/Frameworks/Python.framework/Versions/2.6"],
-                          python26apple : 
+                          python38apple : 
                           ["/System/Library/Frameworks/Python.framework/Versions/2.6"] },
-               arch64 : { python26 : 
+               arch64 : { python38 : 
                           ["/opt/local/Library/Frameworks/Python.framework/Versions/2.6"],
-                          python26apple : 
+                          python38apple : 
                           ["/System/Library/Frameworks/Python.framework/Versions/2.6"] } },
-    linux2 : { arch32 : { python26 :
-                          ["/usr/lib/python2.6"] },
-               arch64 : { python26 :
-                          ["/usr/lib/python2.6"] } }
+    linux : { arch32 : { python38 :
+                          ["/usr/lib/python3.8"] },
+               arch64 : { python38 :
+                          ["/usr/lib/python3.8"] } }
 }
 
 systemLibs = {
     darwin : [],
-    linux2 : ["dl"]
+    linux : ["dl"]
     }
 
 # ------------------------------------------------------------------------------
@@ -121,8 +121,7 @@ def compilerStr(env):
             shell=True,
             bufsize=4096,
             stderr=subprocess.PIPE).stderr.readlines()
-
-    longName = compilerInfo[0].split(":")[0]
+    longName = compilerInfo[0].decode('utf-8').split(":")[0]
     shortName = "-".join(longName.split("-")[-3:])
     return shortName
 
@@ -132,7 +131,7 @@ def pythonVer():
     if sys.platform == darwin:
         return "python" + Script.ARGUMENTS.get('python', '26-apple')
     else:
-        return "python" + Script.ARGUMENTS.get('python', '26')
+        return "python" + Script.ARGUMENTS.get('python', '38')
 
 # ------------------------------------------------------------------------------
 
@@ -197,6 +196,7 @@ def setupEnv(env, pathToRoot = "."):
     env.Append(LIBS = baseLibs)
     for path in baseIncludePaths:
         env.Append(CPPPATH = os.path.join(path, "OpenEXR"))
+    print(env)
     # Sony crap
     if "SP_OS" in os.environ.keys() and "spinux" in os.environ["SP_OS"]:
         # Imath
@@ -215,7 +215,7 @@ def setupEnv(env, pathToRoot = "."):
         env.Append(LIBS = ["Half"])
         env.Append(LIBS = ["Iex"])
         env.Append(LIBS = ["Imath"])
-        env.Append(LIBS = ["boost_thread-mt"])
+        env.Append(LIBS = ["boost_thread"])
     env.Append(LIBS = ["OpenImageIO"])
     env.Append(LIBS = ["Field3D"])
     env.Append(LIBS = ["GPD-pvr"])
@@ -232,6 +232,7 @@ def setupEnv(env, pathToRoot = "."):
     else:
         env.Append(CCFLAGS = ["-O3"])
     env.Append(CCFLAGS = ["-Wall"])
+    env.Append(CCFLAGS = ["-fpermissive"])
     # Set number of jobs to use
     env.SetOption("num_jobs", numCPUs())
     # 64 bit setup
@@ -273,14 +274,14 @@ def setupPyEnv(env, pathToRoot = "."):
     # Libraries
     env.Prepend(CPPPATH = systemPyCppPaths[sys.platform][architectureStr()][pythonVer()])
     env.Prepend(LIBPATH = systemPyLibPaths[sys.platform][architectureStr()][pythonVer()])
-    env.Append(LIBS = ["boost_python"])
+    env.Append(LIBS = ["boost_python38"])
     # OSX specific
     if sys.platform == darwin:
         # env.Append(FRAMEWORKS = ["Python"])
-        env.Append(LIBS = ["Python2.6"])
+        env.Append(LIBS = ["Python2.7"])
     # Linux specific
-    elif sys.platform == linux2:
-        env.Append(LIBS = ["python2.6"])
+    elif sys.platform == linux:
+        env.Append(LIBS = ["python2.7"])
         
 # ------------------------------------------------------------------------------
 
@@ -291,7 +292,7 @@ def setupAppEnv(env, pathToRoot = "."):
 # ------------------------------------------------------------------------------
 
 def numCPUs():
-    if os.sysconf_names.has_key("SC_NPROCESSORS_ONLN"):
+    if "SC_NPROCESSORS_ONLN" in os.sysconf_names:
         nCPUs = os.sysconf("SC_NPROCESSORS_ONLN")
         if isinstance(nCPUs, int) and nCPUs > 0:
             return nCPUs
@@ -346,7 +347,7 @@ def defineBoostPythonModule(name, files, env):
 def installPyLib(env, lib, files):
     setupBuildOutput(env)
     if "PVR_PYTHON_PATH" not in os.environ.keys():
-        print "$PVR_PYTHON_PATH was not set. Can't install."
+        print("$PVR_PYTHON_PATH was not set. Can't install.")
     installDir = os.environ["PVR_PYTHON_PATH"]
     libInstall = env.Install(os.path.join(installDir, pvrName), lib)
     filesInstall = env.Install(os.path.join(installDir, pvrName), files)
